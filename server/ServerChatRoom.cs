@@ -29,7 +29,7 @@ namespace chat.server
             {
                 Message inputMessage;
 
-                int i;
+                /*int i;
 
                 String data = null;
 
@@ -52,10 +52,10 @@ namespace chat.server
                     // Send back a response.
                     stream.Write(msg, 0, msg.Length);
                     Console.WriteLine("Sent: {0}", data);
-                }
+                }*/
 
 
-                /*while ((inputMessage = getMessage()) != null)
+                while ((inputMessage = getMessage()) != null)
                 {
                     //Message inputMessage = getMessage();
                     switch (inputMessage.Head)
@@ -89,7 +89,7 @@ namespace chat.server
                         default:
                             break;
                     }
-                }*/
+                }
             }
             catch (Exception e)
             {

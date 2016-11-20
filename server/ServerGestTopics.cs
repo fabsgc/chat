@@ -14,7 +14,7 @@ namespace chat.server
 
         public override void gereClient(int port)
         {
-            Console.WriteLine("gereClient SreverGestTopics IN");
+            Console.WriteLine("gereClient ServerGestTopics IN");
 
             tcpTopicsManager = new TCPGestTopics();
 
@@ -22,7 +22,7 @@ namespace chat.server
             {
                 Message inputMessage;
 
-                int i;
+                /*int i;
 
                 String data = null;
 
@@ -45,10 +45,11 @@ namespace chat.server
                     // Send back a response.
                     stream.Write(msg, 0, msg.Length);
                     Console.WriteLine("Sent: {0}", data);
-                }
+                }*/
 
-                /*while ((inputMessage = getMessage()) != null)
+                while ((inputMessage = getMessage()) != null)
                 {
+                    Console.WriteLine("while ((inputMessage = getMessage()) != null)");
                     switch (inputMessage.Head)
                     {
                         case Message.Header.LIST_TOPICS:
@@ -74,7 +75,7 @@ namespace chat.server
                         default:
                             break;
                     }
-                }*/
+                }
             }
             catch (Exception e)
             {

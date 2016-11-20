@@ -15,10 +15,12 @@ namespace chat.server
         private static int nextPort = 16000;
         private bool started;
         private Dictionary<string, ServerChatRoom> chatrooms;
+        private List<string> topics = new List<string>();
 
         public new void createTopic(string topic)
         {
             chatrooms = new Dictionary<string, ServerChatRoom>();
+            topics.Add(topic);
 
             try
             {
@@ -50,7 +52,6 @@ namespace chat.server
 
         public new List<string> listTopics()
         {
-            List<string> topics = new List<string>();
             return topics;
         }
     }

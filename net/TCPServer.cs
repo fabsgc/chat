@@ -106,39 +106,36 @@ namespace chat.net
             return _port;
         }
 
-        /* Pour l'envoi et la réception de données, on est censé sérialiser l'objet Message
-         * Surtout que dans ton code, à la réception, tu mets le header et la liste des messages dans l'attribut data */
-
         public Message getMessage()
         {
-            /*try
+            Console.WriteLine("message received");
+            try
             {
-                NetworkStream strm = new NetworkStream(commSocket);
+                NetworkStream strm = commSocket.GetStream();
                 IFormatter formatter = new BinaryFormatter();
-                return (Message)formatter.Deserialize(strm);
+                Message returnMsg = (Message) formatter.Deserialize(strm);
+                return returnMsg;
             }
             catch (SerializationException e)
             {
                 Console.WriteLine(e.Message);
-            }*/
+            }
 
             return null;
         }
 
         public void sendMessage(Message message)
         {
-            /*try
+            try
             {
                 IFormatter formatter = new BinaryFormatter();
-                NetworkStream strm = new NetworkStream(commSocket);
+                NetworkStream strm = commSocket.GetStream();
                 formatter.Serialize(strm, message);
             }
             catch(SerializationException e)
             {
                 Console.WriteLine(e.Message);
-            }*/
-
-
+            }
         }
 
         /*public Message getMessage()

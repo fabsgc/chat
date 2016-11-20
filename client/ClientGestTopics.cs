@@ -81,18 +81,17 @@ namespace chat.client
 
         public List<string> listTopics()
         {
+            Console.WriteLine("listTopics ClientGestTopics1");
             Message message = new Message(Message.Header.LIST_TOPICS);
-            List<string> topics = null;
-            try
-            {
-                sendMessage(message);
-                Message answer = getMessage();
-                topics = answer.getData();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
+            Console.WriteLine("listTopics ClientGestTopics2");
+            List<string> topics = new List<string>();
+            Console.WriteLine("listTopics ClientGestTopics3");
+            sendMessage(message);
+            Console.WriteLine("listTopics ClientGestTopics4");
+            Message answer = getMessage();
+            Console.WriteLine("listTopics ClientGestTopics5");
+            topics = answer.getData();
+            Console.WriteLine("listTopics ClientGestTopics6");
             return topics;
         }
     }

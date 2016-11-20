@@ -26,6 +26,7 @@ namespace chat.net
         public void connect()
         {
             socket = new TcpClient("127.0.0.1", _port);
+            Console.WriteLine("connected to server");
         }
 
         public void close()
@@ -33,49 +34,6 @@ namespace chat.net
             //socket.Shutdown(SocketShutdown.Both);
             socket.Close();
         }
-
-        /* Pour l'envoi et la réception de données, on est censé sérialiser l'objet Message
-         * Surtout que dans ton code, à la réception, tu mets le header et la liste des messages dans l'attribut data */
-
-        /*public Message getMessage()
-        {
-            try
-            {
-                NetworkStream strm = new NetworkStream(socket);
-                IFormatter formatter = new BinaryFormatter();
-                Message message;
-
-                try
-                {
-                    message = (Message)formatter.Deserialize(strm);
-                    return message;
-                }
-                catch(SerializationException e)
-                {
-                    Console.WriteLine(e.Message);
-                }
-            }
-            catch (SerializationException e)
-            {
-                Console.WriteLine(e.Message);
-            }
-
-            return null;
-        }*/
-
-        /*public void sendMessage(Message message)
-        {
-            try
-            {
-                IFormatter formatter = new BinaryFormatter();
-                NetworkStream strm = new NetworkStream(socket);
-                formatter.Serialize(strm, message);
-            }
-            catch (SerializationException e)
-            {
-                Console.WriteLine(e.Message);
-            }
-        }*/
 
         public int getPort()
         {
@@ -89,23 +47,20 @@ namespace chat.net
 
         public Message getMessage()
         {
-            // Receive the TcpServer.response.
+            try
+            {
+                NetworkStream strm = socket.GetStream();
+                IFormatter formatter = new BinaryFormatter();
+                Message returnMsg = (Message) formatter.Deserialize(strm);
+                return returnMsg;
+            }
+            catch (SerializationException e)
+            {
+                Console.WriteLine(e.Message);
+            }
 
-            // Buffer to store the response bytes.
-            Byte[] data = new Byte[256];
-
-            // String to store the response ASCII representation.
-            String responseData = String.Empty;
-
-            // Read the first batch of the TcpServer response bytes.
-            NetworkStream stream = socket.GetStream();
-            Int32 bytes = stream.Read(data, 0, data.Length);
-            responseData = System.Text.Encoding.ASCII.GetString(data, 0, bytes);
-            //Console.WriteLine("Received: {0}", responseData);
-
-            Message msgReceived = new Message(Message.Header.DEBUG, responseData);
-
-            return msgReceived;
+            Console.WriteLine("on ne devrait pas etre la");
+            return null;
         }
 
         public void sendMessage(Message m)
@@ -114,18 +69,22 @@ namespace chat.net
 
             //string message = m.getData().First();
 
-            string message = "test message";
+            //string message = "test message";
+
+            
 
             // Translate the passed message into ASCII and store it as a Byte array.
-            Byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
+            //Byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
 
             // Get a client stream for reading and writing.
             //  Stream stream = client.GetStream();
 
             NetworkStream stream = socket.GetStream();
+            BinaryFormatter binaryFmt = new BinaryFormatter();
+            binaryFmt.Serialize(stream, m);
 
             // Send the message to the connected TcpServer. 
-            stream.Write(data, 0, data.Length);
+            //stream.Write(data, 0, data.Length);
 
             //Console.WriteLine("Sent: {0}", message);
         }
