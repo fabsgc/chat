@@ -59,6 +59,18 @@ namespace chat.net
         {
             while (true)
             {
+                commSocket = waitSocket.AcceptTcpClient();
+                Console.WriteLine("Connection accepted.");
+
+                var childSocketThread = new Thread(() =>
+                {
+                    gereClient(_port);
+                });
+                childSocketThread.Start();
+            }
+            /*
+            while (true)
+            {
                 Console.WriteLine("treatConnections");
                 try
                 {
@@ -76,7 +88,7 @@ namespace chat.net
                     Console.WriteLine("test4");
                     newInstance.waitSocket = waitSocket;
                     Console.WriteLine("test5");
-                    newInstance.commSocket = newInstance.waitSocket.AcceptTcpClient(); // ça bloque ici
+                    newInstance.commSocket = newInstance.waitSocket.AcceptTcpClient();
                     Console.WriteLine("test6");
 
                     Console.WriteLine("clone OK");
@@ -86,7 +98,7 @@ namespace chat.net
                 {
                     Console.WriteLine(e);
                 }
-            }
+            }*/
         }
 
         public int getPort()
