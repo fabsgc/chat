@@ -13,15 +13,24 @@ namespace chat.test
     {
         public static void Main()
         {
-            IPHostEntry ipHostEntry = Dns.GetHostEntry(Dns.GetHostName());
-            IPAddress ipAddress = ipHostEntry.AddressList[0];
+            IPAddress ipAddress = IPAddress.Parse("127.0.0.1");
 
-            ClientGestTopics cgt = new ClientGestTopics();
-            cgt.setServer(ipAddress, 2300);
-            cgt.connect();
-            Console.WriteLine(cgt.createTopic("Test topic"));
-            Chatroom c = cgt.joinTopic("Test topic");
-            Console.WriteLine(cgt.listTopics().ToString());
+            ClientGestTopics gt = new ClientGestTopics();
+            gt.setServer(ipAddress, 2300);
+            gt.connect();
+            Chatter bob = new TextChatter("Bob");
+            Chatter joe = new TextChatter("Joe");
+            gt.createTopic("java");
+            gt.createTopic("UML");
+            List<string> topics = gt.listTopics();
+            gt.createTopic("jeux");
+            gt.listTopics();
+            /*Chatroom cr = gt.joinTopic("jeux");
+            cr.join(bob);
+            cr.post("Je suis seul ou quoi ?", bob);
+            cr.join(joe);
+            cr.post("Tiens, salut Joe !", bob);
+            cr.post("Toi aussi tu chat sur les forums de jeux pendant les TP, Bob ? ", joe);*/
         }
     }
 }

@@ -9,15 +9,16 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using chat.server;
 
 namespace chat.net
 {
 
     [Serializable]
-    abstract class TCPServer : MessageConnection
+    public abstract class TCPServer : MessageConnection
     {
-        protected Socket commSocket;
-        protected Socket waitSocket; // todo: serversocket in the subject
+        protected TcpClient commSocket;
+        protected TcpListener waitSocket; // todo: serversocket in the subject
         protected int _port; // todo: get port from socket?
         protected enum Mode { treatClient, treatConnections }
         protected Mode mode;
@@ -27,14 +28,11 @@ namespace chat.net
         {
             mode = Mode.treatConnections;
             _port = port;
-            IPHostEntry ipHostEntry = Dns.GetHostEntry(Dns.GetHostName());
-            IPAddress ipAddress = ipHostEntry.AddressList[0];
+            IPAddress ipAddress = IPAddress.Parse("127.0.0.1");
 
             try
             {
-                waitSocket = new Socket(ipAddress.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                waitSocket.Bind(new IPEndPoint(ipAddress, _port));
-                waitSocket.Listen(2000); // 2000 connections allowed
+                waitSocket = new TcpListener(ipAddress, port);
             }
             catch(NotSupportedException e)
             {
@@ -45,38 +43,49 @@ namespace chat.net
                 Console.WriteLine(e.Message);
             }
 
-            Thread t = new Thread(new ThreadStart(this.run));
-            t.Start();
+            // Start the server's TcpListener
+            waitSocket.Start();
+
+            // Enter the listening loop
+            this.treatConnections();
         }
 
         public void stopServer()
         {
-            waitSocket.Shutdown(SocketShutdown.Both);
-            waitSocket.Close();
+            //waitSocket.Close();
         }
 
-        public void run()
+        private void treatConnections()
         {
-            if (mode == Mode.treatConnections)
+            while (true)
             {
-                while (true)
+                Console.WriteLine("treatConnections");
+                try
                 {
-                    try
-                    {
-                        commSocket = waitSocket.Accept();
-                        TCPServer myClone = this.cloneInstance();
-                        Thread t = new Thread(new ThreadStart(myClone.run));
-                        t.Start();
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
+                    commSocket = waitSocket.AcceptTcpClient();
+                    Console.WriteLine("accept");
+
+                    Console.WriteLine("test1");
+
+                    ServerGestTopics newInstance = new ServerGestTopics();
+                    Console.WriteLine("test2");
+
+                    newInstance.mode = Mode.treatClient;
+                    Console.WriteLine("test3");
+                    newInstance._port = _port;
+                    Console.WriteLine("test4");
+                    newInstance.waitSocket = waitSocket;
+                    Console.WriteLine("test5");
+                    newInstance.commSocket = newInstance.waitSocket.AcceptTcpClient(); // ça bloque ici
+                    Console.WriteLine("test6");
+
+                    Console.WriteLine("clone OK");
+                    newInstance.gereClient(_port);
                 }
-            }
-            else
-            {
-                gereClient(_port);
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
             }
         }
 
@@ -90,7 +99,7 @@ namespace chat.net
 
         public Message getMessage()
         {
-            try
+            /*try
             {
                 NetworkStream strm = new NetworkStream(commSocket);
                 IFormatter formatter = new BinaryFormatter();
@@ -99,14 +108,14 @@ namespace chat.net
             catch (SerializationException e)
             {
                 Console.WriteLine(e.Message);
-            }
+            }*/
 
             return null;
         }
 
         public void sendMessage(Message message)
         {
-            try
+            /*try
             {
                 IFormatter formatter = new BinaryFormatter();
                 NetworkStream strm = new NetworkStream(commSocket);
@@ -115,7 +124,9 @@ namespace chat.net
             catch(SerializationException e)
             {
                 Console.WriteLine(e.Message);
-            }
+            }*/
+
+
         }
 
         /*public Message getMessage()
@@ -141,7 +152,5 @@ namespace chat.net
         }*/
 
         public abstract void gereClient(int port);
-
-        public abstract TCPServer cloneInstance();
     }
 }

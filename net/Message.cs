@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace chat.net
 {
     [Serializable]
-    class Message
+    public class Message
     {
         public enum Header { DEBUG, LIST_TOPICS, LISTE_TOPICS_REPLY, CREATE_TOPIC, JOIN_TOPIC, JOIN_REPLY, POST, GET, JOIN_CR, QUIT_CR }
         private Header head;

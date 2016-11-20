@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -13,9 +14,8 @@ namespace chat.net
     class TCPClient : MessageConnection
     {
         private int _port; // todo: get port from socket?
-        private Socket socket;
+        private TcpClient socket;
         private IPAddress _adr;
-        private IPEndPoint remoteEP;
 
         public void setServer(IPAddress adr, int port)
         {
@@ -25,29 +25,19 @@ namespace chat.net
 
         public void connect()
         {
-
-            remoteEP = new IPEndPoint(_adr, _port);
-            socket = new Socket(_adr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-            try
-            {
-                socket.Connect(remoteEP);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
+            socket = new TcpClient("127.0.0.1", _port);
         }
 
         public void close()
         {
-            socket.Shutdown(SocketShutdown.Both);
+            //socket.Shutdown(SocketShutdown.Both);
             socket.Close();
         }
 
         /* Pour l'envoi et la réception de données, on est censé sérialiser l'objet Message
          * Surtout que dans ton code, à la réception, tu mets le header et la liste des messages dans l'attribut data */
 
-        public Message getMessage()
+        /*public Message getMessage()
         {
             try
             {
@@ -71,9 +61,9 @@ namespace chat.net
             }
 
             return null;
-        }
+        }*/
 
-        public void sendMessage(Message message)
+        /*public void sendMessage(Message message)
         {
             try
             {
@@ -85,7 +75,7 @@ namespace chat.net
             {
                 Console.WriteLine(e.Message);
             }
-        }
+        }*/
 
         public int getPort()
         {
@@ -97,26 +87,47 @@ namespace chat.net
             return _adr;
         }
 
-        /*public Message getMessage()
+        public Message getMessage()
         {
-            // Data buffer for incoming data.
-            bytes = new byte[1024];
+            // Receive the TcpServer.response.
 
-            // Receive the response from the remote device.
-            int bytesRec = socket.Receive(bytes);
+            // Buffer to store the response bytes.
+            Byte[] data = new Byte[256];
 
-            Message msgReceived = new Message(bytes, bytesRec);
+            // String to store the response ASCII representation.
+            String responseData = String.Empty;
+
+            // Read the first batch of the TcpServer response bytes.
+            NetworkStream stream = socket.GetStream();
+            Int32 bytes = stream.Read(data, 0, data.Length);
+            responseData = System.Text.Encoding.ASCII.GetString(data, 0, bytes);
+            //Console.WriteLine("Received: {0}", responseData);
+
+            Message msgReceived = new Message(Message.Header.DEBUG, responseData);
 
             return msgReceived;
         }
 
         public void sendMessage(Message m)
         {
-            // Encode the data string into a byte array.
-            byte[] msg = Encoding.ASCII.GetBytes(m.toString());
+            //Console.WriteLine("sendmessage");
 
-            // Send the data through the socket.
-            socket.Send(msg);
-        }*/
+            //string message = m.getData().First();
+
+            string message = "test message";
+
+            // Translate the passed message into ASCII and store it as a Byte array.
+            Byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
+
+            // Get a client stream for reading and writing.
+            //  Stream stream = client.GetStream();
+
+            NetworkStream stream = socket.GetStream();
+
+            // Send the message to the connected TcpServer. 
+            stream.Write(data, 0, data.Length);
+
+            //Console.WriteLine("Sent: {0}", message);
+        }
     }
 }

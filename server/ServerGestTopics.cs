@@ -8,19 +8,46 @@ using System.Net.Sockets;
 namespace chat.server
 {
     [Serializable]
-    class ServerGestTopics : TCPServer
+    public class ServerGestTopics : TCPServer
     {
         private TCPGestTopics tcpTopicsManager;
 
         public override void gereClient(int port)
         {
+            Console.WriteLine("gereClient SreverGestTopics IN");
+
             tcpTopicsManager = new TCPGestTopics();
 
             try
             {
                 Message inputMessage;
 
-                while ((inputMessage = getMessage()) != null)
+                int i;
+
+                String data = null;
+
+                Byte[] bytes = new Byte[256];
+
+                // Listen to the client
+                NetworkStream stream = commSocket.GetStream();
+
+                while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
+                {
+                    // Translate data bytes to a ASCII string.
+                    data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
+                    Console.WriteLine("Received: {0}", data);
+
+                    // Process the data sent by the client.
+                    data = data.ToUpper();
+
+                    byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
+
+                    // Send back a response.
+                    stream.Write(msg, 0, msg.Length);
+                    Console.WriteLine("Sent: {0}", data);
+                }
+
+                /*while ((inputMessage = getMessage()) != null)
                 {
                     switch (inputMessage.Head)
                     {
@@ -47,24 +74,12 @@ namespace chat.server
                         default:
                             break;
                     }
-                }
+                }*/
             }
             catch (Exception e)
             {
                 Console.WriteLine(e.Message);
             }
-        }
-
-        public override TCPServer cloneInstance()
-        {
-            ServerGestTopics newInstance = new ServerGestTopics();
-
-            newInstance.mode = Mode.treatClient;
-            newInstance._port = _port;
-            newInstance.waitSocket = waitSocket;
-            newInstance.commSocket = newInstance.waitSocket.Accept();
-
-            return newInstance;
         }
     }
 }
