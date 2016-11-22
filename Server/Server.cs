@@ -61,6 +61,9 @@ namespace Server
 
         public void run()
         {
+            UserManager.load("users.db");
+            ChatroomManager.load("chatrooms.db");
+
             Thread checkData = new Thread(new ThreadStart(this.checkData));
             checkData.Start();
 
